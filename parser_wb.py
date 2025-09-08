@@ -33,7 +33,7 @@ async def scheduler():
             options.add_argument(f'--user-agent={user_agent}')
             print(2)
             # Инициализация undetected-chromedriver
-            browser = uc.Chrome(options=options)
+            browser = uc.Chrome(options=options, version_main=127)
             print(3)
             async with Session() as session:
                 result = await session.execute(select(ProductLink))
