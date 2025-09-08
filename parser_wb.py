@@ -33,7 +33,7 @@ async def scheduler():
             options.add_argument(f'--user-agent={user_agent}')
             print(2)
             # Инициализация undetected-chromedriver
-            browser = uc.Chrome(options=options, version_main=127)
+            browser = uc.Chrome(options=options)
             print(3)
             async with Session() as session:
                 result = await session.execute(select(ProductLink))
@@ -46,7 +46,9 @@ async def scheduler():
 
                         html = browser.page_source
                         soup = bs4.BeautifulSoup(html, 'lxml')
-                        print(soup.prettify())
+                        souptext = soup.find(attrs={"class": "product-page productPage--KE6FH"})
+
+                        print(souptext.prettify())
 
                         # Парсим название товара
                         try:
