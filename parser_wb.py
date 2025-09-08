@@ -1,44 +1,40 @@
 import asyncio
-
 import bs4
 from sqlalchemy import select
-
 from db.models import Session, ProductLink
 from bot import bot
-
+import undetected_chromedriver as uc
 from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver import Chrome
 
 
 async def scheduler():
     while True:
         try:
-            chrome_driver_path: str = ChromeDriverManager().install()
-            browser_service: Service = Service(executable_path=chrome_driver_path)
-
+            print(1)
             # Настройка опций браузера
-            options: Options = Options()
+            options = uc.ChromeOptions()
             options.add_argument('--headless')
             options.add_argument('--no-sandbox')
-            options.page_load_strategy = 'eager'
-            options.add_argument('--blink-settings=imagesEnabled=false')
+            options.add_argument('--disable-dev-shm-usage')
             options.add_argument('--disable-blink-features=AutomationControlled')
+            options.add_argument('--disable-gpu')
+            options.add_argument('--disable-extensions')
+            options.add_argument('--disable-popup-blocking')
+            options.add_argument('--disable-features=VizDisplayCompositor')
+            options.add_argument('--disable-accelerated-2d-canvas')
+            options.add_argument('--disable-webgl')
+            options.add_argument('--no-first-run')
+            options.add_argument('--no-zygote')
+            options.add_argument('--single-process')
+            options.add_argument('--disable-setuid-sandbox')
 
-            browser: Chrome = Chrome(service=browser_service, options=options)
-
-            # Обход анти-бот защиты
-            browser.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
-                'source': '''
-                        delete window.cdc_adoQpoasnfa76pfcZLmcfl_Array;
-                        delete window.cdc_adoQpoasnfa76pfcZLmcfl_Promise;
-                        delete window.cdc_adoQpoasnfa76pfcZLmcfl_Symbol;
-                        delete window.cdc_adoQpoasnfa76pfcZLmcfl_JSON;
-                        delete window.cdc_adoQpoasnfa76pfcZLmcfl_Object;
-                        delete window.cdc_adoQpoasnfa76pfcZLmcfl_Proxy;
-                    '''
-            })
+            # Установка пользовательского User-Agent
+            user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            options.add_argument(f'--user-agent={user_agent}')
+            print(2)
+            # Инициализация undetected-chromedriver
+            browser = uc.Chrome(options=options, version_main=127)
+            print(3)
             async with Session() as session:
                 result = await session.execute(select(ProductLink))
                 all_links = result.scalars().all()
@@ -47,8 +43,10 @@ async def scheduler():
                     try:
                         browser.get(link.link_url)
                         await asyncio.sleep(3)
+
                         html = browser.page_source
                         soup = bs4.BeautifulSoup(html, 'lxml')
+                        print(soup.prettify())
 
                         # Парсим название товара
                         try:
