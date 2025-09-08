@@ -1,4 +1,6 @@
 import asyncio
+import datetime
+
 import bs4
 from sqlalchemy import select
 from db.models import Session, ProductLink
@@ -9,6 +11,7 @@ from selenium.webdriver.chrome.options import Options
 
 async def scheduler():
     while True:
+        start_time = datetime.datetime.now()
         try:
             print(1)
             # Настройка опций браузера
@@ -38,7 +41,8 @@ async def scheduler():
             async with Session() as session:
                 result = await session.execute(select(ProductLink))
                 all_links = result.scalars().all()
-
+                browser.get(all_links[0].link_url)
+                await asyncio.sleep(3)
                 for link in all_links:
                     try:
                         browser.get(link.link_url)
@@ -67,9 +71,17 @@ async def scheduler():
                                 digits = ''.join([c for c in price_text if c.isdigit()])
                                 new_price = int(digits) if digits else None
                             except:
-                                new_price = None
+                                try:
+                                    price_text = soup.find(
+                                        attrs={"class": "priceBlockFinalPrice--iToZR redPrice--iueN6"}).text.strip()
+                                    digits = ''.join([c for c in price_text if c.isdigit()])
+                                    new_price = int(digits) if digits else None
+                                except:
+                                    new_price = None
                         print(new_name)
                         print(new_price)
+                        if not new_price and new_name:
+                            await bot.send_message(1012882762, f'{link.link_url} - цена не определилась')
 
                         # Если данные получены успешно
                         if new_name and new_price:
@@ -82,7 +94,10 @@ async def scheduler():
                                     f"📉 Старая цена: {link.price} руб.\n"
                                     f"📈 Новая цена: {new_price} руб."
                                 )
-                                await bot.send_message(link.user_id, message)
+                                try:
+                                    await bot.send_message(link.user_id, message, disable_web_page_preview=True)
+                                except:
+                                    pass
 
                             # Обновляем данные в БД
                             link.name = new_name
@@ -90,13 +105,18 @@ async def scheduler():
                             await session.commit()
 
                     except:
-                        await bot.send_message(link.user_id, f"Ошибка при обработке ссылки {link.link_url}, проверьте ее корректность в браузере.\n"
+                        try:
+                            await bot.send_message(link.user_id, f"Ошибка при обработке ссылки {link.link_url}, проверьте ее корректность в браузере.\n"
                                                              f"Если ссылка не корректна, то удалите ее командой /remove")
+                        except:
+                            pass
                         await session.rollback()
             browser.quit()
         except Exception as e:
             await bot.send_message(1012882762, str(e))
-        await asyncio.sleep(8000)
+        elapsed = datetime.datetime.now() - start_time  # Время выполнения задачи
+        wait_time = max(datetime.timedelta(hours=3) - elapsed, datetime.timedelta(0))  # Ждём оставшееся время
+        await asyncio.sleep(wait_time.total_seconds())  # Ожидание до следующего цикла
 
 if __name__ == '__main__':
     asyncio.run(scheduler())
