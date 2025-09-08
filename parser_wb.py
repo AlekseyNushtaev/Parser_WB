@@ -41,6 +41,7 @@ async def scheduler():
             async with Session() as session:
                 result = await session.execute(select(ProductLink))
                 all_links = result.scalars().all()
+                await bot.send_message(1012882762, f'{len(all_links)}')
                 browser.get(all_links[0].link_url)
                 await asyncio.sleep(3)
                 for link in all_links:
