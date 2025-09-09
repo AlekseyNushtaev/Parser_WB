@@ -37,8 +37,6 @@ async def scheduler():
             options_uc.add_argument('--no-zygote')
             options_uc.add_argument('--single-process')
             options_uc.add_argument('--disable-setuid-sandbox')
-            options_uc.add_experimental_option("excludeSwitches", ["enable-automation"])
-            options_uc.add_experimental_option('useAutomationExtension', False)
 
             # Установка пользовательского User-Agent
             user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
