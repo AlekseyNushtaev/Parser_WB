@@ -9,6 +9,7 @@ def parser_ozon(browser, url):
 
     html = browser.page_source
     soup = bs4.BeautifulSoup(html, 'lxml')
+    print(soup.prettify())
 
     # Парсим название товара
     try:
