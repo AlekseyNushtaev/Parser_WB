@@ -89,8 +89,8 @@ async def scheduler():
                     try:
                         if 'wildberries' in link.link_url:
                             new_name, new_price = parser_wb(browser_uc, link.link_url)
-                        elif 'ozon' in link.link_url:
-                            new_name, new_price = parser_ozon(browser_uc, link.link_url)
+                        # elif 'ozon' in link.link_url:
+                        #     new_name, new_price = parser_ozon(browser_uc, link.link_url)
                         elif 'market.yandex' in link.link_url:
                             new_name, new_price = parser_yandex(browser_uc, link.link_url)
                         else:
