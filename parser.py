@@ -92,7 +92,7 @@ async def scheduler():
                         # elif 'ozon' in link.link_url:
                         #     new_name, new_price = parser_ozon(browser_uc, link.link_url)
                         elif 'market.yandex' in link.link_url:
-                            new_name, new_price = parser_yandex(browser_uc, link.link_url)
+                            new_name, new_price = parser_yandex(browser, link.link_url)
                         else:
                             try:
                                 await bot.send_message(link.user_id,
@@ -126,7 +126,8 @@ async def scheduler():
                             link.price = new_price
                             await session.commit()
 
-                    except:
+                    except Exception as e:
+                        print(e)
                         try:
                             await bot.send_message(link.user_id, f"Ошибка при обработке ссылки {link.link_url}, проверьте ее корректность в браузере.\n"
                                                              f"Если ссылка не корректна, то удалите ее командой /remove")
