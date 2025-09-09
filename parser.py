@@ -43,10 +43,12 @@ async def scheduler():
             options_uc.add_argument(f'--user-agent={user_agent}')
             # Инициализация undetected-chromedriver
             browser_uc = uc.Chrome(options=options_uc, version_main=VERSION)
-
+            print(2)
             chrome_driver_path = ChromeDriverManager().install()
             browser_service = Service(executable_path=chrome_driver_path)
             options = Options()
+            options.add_argument('--headless')
+            options.add_argument('--no-sandbox')
             options.add_argument("--start-maximized")
             options.page_load_strategy = 'eager'
             options.add_argument('--disable-blink-features=AutomationControlled')
@@ -61,7 +63,7 @@ async def scheduler():
                     delete window.cdc_adoQpoasnfa76pfcZLmcfl_Proxy;
                 '''
             })
-            print(2)
+            print(3)
             async with Session() as session:
                 result = await session.execute(select(ProductLink))
                 all_links = result.scalars().all()
