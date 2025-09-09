@@ -115,6 +115,7 @@ async def scheduler():
                             pass
                         await session.rollback()
             browser.quit()
+            browser_uc.quit()
         except Exception as e:
             await bot.send_message(1012882762, str(e))
         elapsed = datetime.datetime.now() - start_time  # Время выполнения задачи
