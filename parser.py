@@ -14,6 +14,7 @@ from selenium.webdriver import Chrome
 
 from markets.parser_ozon import parser_ozon
 from markets.parser_wb import parser_wb
+from markets.parser_yandex import parser_yandex
 
 
 async def scheduler():
@@ -90,6 +91,8 @@ async def scheduler():
                             new_name, new_price = parser_wb(browser_uc, link.link_url)
                         elif 'ozon' in link.link_url:
                             new_name, new_price = parser_ozon(browser_uc, link.link_url)
+                        elif 'market.yandex' in link.link_url:
+                            new_name, new_price = parser_yandex(browser_uc, link.link_url)
                         else:
                             try:
                                 await bot.send_message(link.user_id,
