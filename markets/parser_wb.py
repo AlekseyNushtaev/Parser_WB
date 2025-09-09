@@ -5,7 +5,7 @@ import bs4
 
 def parser_wb(browser, url):
     browser.get(url)
-    time.sleep(2)
+    time.sleep(3)
 
     html = browser.page_source
     soup = bs4.BeautifulSoup(html, 'lxml')
