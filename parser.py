@@ -18,48 +18,48 @@ from markets.parser_yandex import parser_yandex
 
 
 async def scheduler():
+    print(1)
+    # Настройка опций браузера
+    options_uc = uc.ChromeOptions()
+    options_uc.add_argument('--headless=new')
+    options_uc.add_argument('--disable-blink-features=AutomationControlled')
+    options_uc.add_argument('--disable-gpu')
+    options_uc.add_argument('--no-sandbox')
+    options_uc.add_argument('--disable-setuid-sandbox')
+    options_uc.add_argument('--disable-dev-shm-usage')
+    options_uc.add_argument('--remote-debugging-port=9222')
+    options_uc.add_argument('--disable-extensions')
+    options_uc.add_argument('--disable-application-cache')
+    options_uc.add_argument('--disable-background-timer-throttling')
+    options_uc.add_argument('--disable-backgrounding-occluded-windows')
+    options_uc.add_argument('--disable-renderer-backgrounding')
+    options_uc.add_argument('--disable-cache')
+    options_uc.add_argument('--disable-software-rasterizer')
+    options_uc.add_argument('--disable-background-networking')
+    options_uc.add_argument('--disable-default-apps')
+    options_uc.add_argument('--disable-sync')
+    options_uc.add_argument('--disable-translate')
+    options_uc.add_argument('--metrics-recording-only')
+    options_uc.add_argument('--no-first-run')
+    options_uc.add_argument('--safebrowsing-disable-auto-update')
+    options_uc.add_argument('--password-store=basic')
+    options_uc.add_argument('--autoplay-policy=user-gesture-required')
+    options_uc.add_argument('--enable-features=UserAgentClientHint')
+    options_uc.add_argument('--window-size=1920,1080')
+    options_uc.page_load_strategy = 'eager'
+    options_uc.add_argument(
+        '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
+
+    # Инициализация undetected-chromedriver
+    browser_uc = uc.Chrome(options=options_uc, version_main=VERSION)
+    browser_uc.execute_cdp_cmd('Network.setUserAgentOverride', {
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    })
+    browser_uc.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+    print(2)
     while True:
         start_time = datetime.datetime.now()
         try:
-            print(1)
-            # Настройка опций браузера
-            options_uc = uc.ChromeOptions()
-            options_uc.add_argument('--headless=new')
-            options_uc.add_argument('--disable-blink-features=AutomationControlled')
-            options_uc.add_argument('--disable-gpu')
-            options_uc.add_argument('--no-sandbox')
-            options_uc.add_argument('--disable-setuid-sandbox')
-            options_uc.add_argument('--disable-dev-shm-usage')
-            options_uc.add_argument('--remote-debugging-port=9222')
-            options_uc.add_argument('--disable-extensions')
-            options_uc.add_argument('--disable-application-cache')
-            options_uc.add_argument('--disable-background-timer-throttling')
-            options_uc.add_argument('--disable-backgrounding-occluded-windows')
-            options_uc.add_argument('--disable-renderer-backgrounding')
-            options_uc.add_argument('--disable-cache')
-            options_uc.add_argument('--disable-software-rasterizer')
-            options_uc.add_argument('--disable-background-networking')
-            options_uc.add_argument('--disable-default-apps')
-            options_uc.add_argument('--disable-sync')
-            options_uc.add_argument('--disable-translate')
-            options_uc.add_argument('--metrics-recording-only')
-            options_uc.add_argument('--no-first-run')
-            options_uc.add_argument('--safebrowsing-disable-auto-update')
-            options_uc.add_argument('--password-store=basic')
-            options_uc.add_argument('--autoplay-policy=user-gesture-required')
-            options_uc.add_argument('--enable-features=UserAgentClientHint')
-            options_uc.add_argument('--window-size=1920,1080')
-            options_uc.page_load_strategy = 'eager'
-            options_uc.add_argument(
-                '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
-
-            # Инициализация undetected-chromedriver
-            browser_uc = uc.Chrome(options=options_uc, version_main=VERSION)
-            browser_uc.execute_cdp_cmd('Network.setUserAgentOverride', {
-                "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-            })
-            browser_uc.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
-            print(2)
             # chrome_driver_path = ChromeDriverManager().install()
             # browser_service = Service(executable_path=chrome_driver_path)
             # options = Options()
@@ -136,7 +136,7 @@ async def scheduler():
                             pass
                         await session.rollback()
             # browser.quit()
-            browser_uc.quit()
+            # browser_uc.quit()
         except Exception as e:
             await bot.send_message(1012882762, str(e))
         # elapsed = datetime.datetime.now() - start_time  # Время выполнения задачи
