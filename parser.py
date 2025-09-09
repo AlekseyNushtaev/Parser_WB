@@ -1,12 +1,19 @@
 import asyncio
 import datetime
 
-import bs4
 from sqlalchemy import select
+
+from config import VERSION
 from db.models import Session, ProductLink
 from bot import bot
 import undetected_chromedriver as uc
 from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver import Chrome
+
+from markets.parser_ozon import parser_ozon
+from markets.parser_wb import parser_wb
 
 
 async def scheduler():
@@ -15,70 +22,65 @@ async def scheduler():
         try:
             print(1)
             # Настройка опций браузера
-            options = uc.ChromeOptions()
-            options.add_argument('--headless')
-            options.add_argument('--no-sandbox')
-            options.add_argument('--disable-dev-shm-usage')
-            options.add_argument('--disable-blink-features=AutomationControlled')
-            options.add_argument('--disable-gpu')
-            options.add_argument('--disable-extensions')
-            options.add_argument('--disable-popup-blocking')
-            options.add_argument('--disable-features=VizDisplayCompositor')
-            options.add_argument('--disable-accelerated-2d-canvas')
-            options.add_argument('--disable-webgl')
-            options.add_argument('--no-first-run')
-            options.add_argument('--no-zygote')
-            options.add_argument('--single-process')
-            options.add_argument('--disable-setuid-sandbox')
+            options_uc = uc.ChromeOptions()
+            options_uc.add_argument('--headless')
+            options_uc.add_argument('--no-sandbox')
+            options_uc.add_argument('--disable-dev-shm-usage')
+            options_uc.add_argument('--disable-blink-features=AutomationControlled')
+            options_uc.add_argument('--disable-gpu')
+            options_uc.add_argument('--disable-extensions')
+            options_uc.add_argument('--disable-popup-blocking')
+            options_uc.add_argument('--disable-features=VizDisplayCompositor')
+            options_uc.add_argument('--disable-accelerated-2d-canvas')
+            options_uc.add_argument('--disable-webgl')
+            options_uc.add_argument('--no-first-run')
+            options_uc.add_argument('--no-zygote')
+            options_uc.add_argument('--single-process')
+            options_uc.add_argument('--disable-setuid-sandbox')
 
             # Установка пользовательского User-Agent
             user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-            options.add_argument(f'--user-agent={user_agent}')
-            print(2)
+            options_uc.add_argument(f'--user-agent={user_agent}')
             # Инициализация undetected-chromedriver
-            browser = uc.Chrome(options=options, version_main=127)
-            print(3)
+            browser_uc = uc.Chrome(options=options_uc, version_main=VERSION)
+
+            chrome_driver_path = ChromeDriverManager().install()
+            browser_service = Service(executable_path=chrome_driver_path)
+            options = Options()
+            options.add_argument("--start-maximized")
+            options.page_load_strategy = 'eager'
+            options.add_argument('--disable-blink-features=AutomationControlled')
+            browser = Chrome(service=browser_service, options=options)
+            browser.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
+                'source': '''
+                    delete window.cdc_adoQpoasnfa76pfcZLmcfl_Array;
+                    delete window.cdc_adoQpoasnfa76pfcZLmcfl_Promise;
+                    delete window.cdc_adoQpoasnfa76pfcZLmcfl_Symbol;
+                    delete window.cdc_adoQpoasnfa76pfcZLmcfl_JSON;
+                    delete window.cdc_adoQpoasnfa76pfcZLmcfl_Object;
+                    delete window.cdc_adoQpoasnfa76pfcZLmcfl_Proxy;
+                '''
+            })
+            print(2)
             async with Session() as session:
                 result = await session.execute(select(ProductLink))
                 all_links = result.scalars().all()
                 await bot.send_message(1012882762, f'{len(all_links)}')
-                browser.get(all_links[0].link_url)
+                browser_uc.get('https://www.wildberries.ru/catalog/173182258/detail.aspx?size=287264697')
                 await asyncio.sleep(3)
                 for link in all_links:
                     try:
-                        browser.get(link.link_url)
-                        await asyncio.sleep(3)
-
-                        html = browser.page_source
-                        soup = bs4.BeautifulSoup(html, 'lxml')
-
-                        # Парсим название товара
-                        try:
-                            new_name = soup.find('h1').text.strip()
-                        except:
+                        if 'wildberries' in link.link_url:
+                            new_name, new_price = parser_wb(browser_uc, link.link_url)
+                        elif 'ozon' in link.link_url:
+                            new_name, new_price = parser_ozon(browser, link.link_url)
+                        else:
                             try:
-                                new_name = soup.find(attrs={"class": "productTitle--J2W7I"}).text.strip()
+                                await bot.send_message(link.user_id,
+                                                       f"Ошибка при обработке ссылки {link.link_url}, проверьте ее корректность в браузере.\n"
+                                                       f"Если ссылка не корректна, то удалите ее командой /remove")
                             except:
-                                new_name = None
-
-                        # Парсим цену
-                        try:
-                            price_text = soup.find(attrs={"class": "priceBlockWalletPrice--RJGuT"}).text.strip()
-                            digits = ''.join([c for c in price_text if c.isdigit()])
-                            new_price = int(digits) if digits else None
-                        except:
-                            try:
-                                price_text = soup.find(attrs={"class": "priceBlockWalletPrice--RJGuT redPrice--iueN6"}).text.strip()
-                                digits = ''.join([c for c in price_text if c.isdigit()])
-                                new_price = int(digits) if digits else None
-                            except:
-                                try:
-                                    price_text = soup.find(
-                                        attrs={"class": "priceBlockFinalPrice--iToZR redPrice--iueN6"}).text.strip()
-                                    digits = ''.join([c for c in price_text if c.isdigit()])
-                                    new_price = int(digits) if digits else None
-                                except:
-                                    new_price = None
+                                pass
                         print(new_name)
                         print(new_price)
                         if not new_price and new_name:

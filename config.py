@@ -10,4 +10,4 @@ TG_TOKEN: Optional[str] = os.environ.get("TG_TOKEN")
 
 # Множество ID администраторов бота
 ADMIN_IDS: Set[int] = {int(x) for x in os.environ.get("ADMIN_IDS", "").split()} if os.environ.get("ADMIN_IDS") else set()
-
+VERSION: int = int(os.environ.get("VERSION"))
