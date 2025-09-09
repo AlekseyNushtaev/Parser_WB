@@ -135,13 +135,13 @@ async def scheduler():
                         except:
                             pass
                         await session.rollback()
-            browser.quit()
+            # browser.quit()
             browser_uc.quit()
         except Exception as e:
             await bot.send_message(1012882762, str(e))
-        elapsed = datetime.datetime.now() - start_time  # Время выполнения задачи
-        wait_time = max(datetime.timedelta(hours=3) - elapsed, datetime.timedelta(0))  # Ждём оставшееся время
-        await asyncio.sleep(wait_time.total_seconds())  # Ожидание до следующего цикла
+        # elapsed = datetime.datetime.now() - start_time  # Время выполнения задачи
+        # wait_time = max(datetime.timedelta(hours=3) - elapsed, datetime.timedelta(0))  # Ждём оставшееся время
+        # await asyncio.sleep(wait_time.total_seconds())  # Ожидание до следующего цикла
 
 if __name__ == '__main__':
     asyncio.run(scheduler())

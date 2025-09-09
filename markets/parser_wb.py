@@ -1,11 +1,12 @@
 import time
+import random
 
 import bs4
 
 
 def parser_wb(browser, url):
     browser.get(url)
-    time.sleep(3)
+    time.sleep(random.uniform(2.5, 4))
 
     html = browser.page_source
     soup = bs4.BeautifulSoup(html, 'lxml')
