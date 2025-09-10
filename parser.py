@@ -100,15 +100,15 @@ async def scheduler():
                         if 'wildberries' in link.link_url:
                             print('wb')
                             new_name, new_price = parser_wb(browser_uc, link.link_url)
-                        elif 'ozon' in link.link_url:
-                            print('ozon')
-                            new_name, new_price = parser_ozon(browser_uc, link.link_url)
-                        elif 'market.yandex' in link.link_url:
-                            print('yandex')
-                            new_name, new_price = parser_yandex(browser_uc, link.link_url)
-                        elif 'avito' in link.link_url:
-                            print('avito')
-                            new_name, new_price = parser_avito(browser_uc, link.link_url)
+                        # elif 'ozon' in link.link_url:
+                        #     print('ozon')
+                        #     new_name, new_price = parser_ozon(browser_uc, link.link_url)
+                        # elif 'market.yandex' in link.link_url:
+                        #     print('yandex')
+                        #     new_name, new_price = parser_yandex(browser_uc, link.link_url)
+                        # elif 'avito' in link.link_url:
+                        #     print('avito')
+                        #     new_name, new_price = parser_avito(browser_uc, link.link_url)
                         else:
                             try:
                                 await bot.send_message(link.user_id,
