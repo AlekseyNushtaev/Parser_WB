@@ -1,6 +1,6 @@
 import asyncio
 import datetime
-
+from selenium_stealth import stealth
 from sqlalchemy import select
 
 from config import VERSION
@@ -56,6 +56,14 @@ async def scheduler():
 
             # Инициализация undetected-chromedriver
             browser_uc = uc.Chrome(options=options_uc, version_main=VERSION)
+            stealth(browser_uc,
+                    languages=["en-US", "en"],
+                    vendor="Google Inc.",
+                    platform="Win64",
+                    webgl_vendor="Intel Inc.",
+                    renderer="Intel Iris OpenGL Engine",
+                    fix_hairline=True,
+                    )
             browser_uc.execute_cdp_cmd('Network.setUserAgentOverride', {
                 "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
             })
