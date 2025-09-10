@@ -51,8 +51,8 @@ async def scheduler():
             options_uc.add_argument('--enable-features=UserAgentClientHint')
             options_uc.add_argument('--window-size=1920,1080')
             options_uc.page_load_strategy = 'eager'
-            options_uc.add_argument(
-                '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
+
+            options_uc.add_argument('--user-agent=Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1')
 
             # Инициализация undetected-chromedriver
             browser_uc = uc.Chrome(options=options_uc, version_main=VERSION)
@@ -69,26 +69,26 @@ async def scheduler():
             })
             browser_uc.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
             print(2)
-            chrome_driver_path = ChromeDriverManager().install()
-            browser_service = Service(executable_path=chrome_driver_path)
-            options = Options()
-            options.add_argument('--headless')
-            options.add_argument('--no-sandbox')
-            options.add_argument("--start-maximized")
-            options.page_load_strategy = 'eager'
-            options.add_argument('--disable-blink-features=AutomationControlled')
-            browser = Chrome(service=browser_service, options=options)
-            browser.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
-                'source': '''
-                    delete window.cdc_adoQpoasnfa76pfcZLmcfl_Array;
-                    delete window.cdc_adoQpoasnfa76pfcZLmcfl_Promise;
-                    delete window.cdc_adoQpoasnfa76pfcZLmcfl_Symbol;
-                    delete window.cdc_adoQpoasnfa76pfcZLmcfl_JSON;
-                    delete window.cdc_adoQpoasnfa76pfcZLmcfl_Object;
-                    delete window.cdc_adoQpoasnfa76pfcZLmcfl_Proxy;
-                '''
-            })
-            print(3)
+            # chrome_driver_path = ChromeDriverManager().install()
+            # browser_service = Service(executable_path=chrome_driver_path)
+            # options = Options()
+            # options.add_argument('--headless')
+            # options.add_argument('--no-sandbox')
+            # options.add_argument("--start-maximized")
+            # options.page_load_strategy = 'eager'
+            # options.add_argument('--disable-blink-features=AutomationControlled')
+            # browser = Chrome(service=browser_service, options=options)
+            # browser.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
+            #     'source': '''
+            #         delete window.cdc_adoQpoasnfa76pfcZLmcfl_Array;
+            #         delete window.cdc_adoQpoasnfa76pfcZLmcfl_Promise;
+            #         delete window.cdc_adoQpoasnfa76pfcZLmcfl_Symbol;
+            #         delete window.cdc_adoQpoasnfa76pfcZLmcfl_JSON;
+            #         delete window.cdc_adoQpoasnfa76pfcZLmcfl_Object;
+            #         delete window.cdc_adoQpoasnfa76pfcZLmcfl_Proxy;
+            #     '''
+            # })
+            # print(3)
             async with Session() as session:
                 result = await session.execute(select(ProductLink))
                 all_links = result.scalars().all()
