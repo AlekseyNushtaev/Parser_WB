@@ -116,6 +116,7 @@ async def scheduler():
                                                        f"Если ссылка не корректна, то удалите ее командой /remove")
                             except:
                                 pass
+                            continue
                         print(new_name)
                         print(new_price)
                         if not new_price and new_name:
