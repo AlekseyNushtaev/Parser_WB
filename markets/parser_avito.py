@@ -3,7 +3,7 @@ import time
 import bs4
 
 
-def parser_ozon(browser, url):
+def parser_avito(browser, url):
     browser.get(url)
     time.sleep(2)
 
@@ -15,13 +15,13 @@ def parser_ozon(browser, url):
         new_name = soup.find('h1').text.strip()
     except:
         try:
-            new_name = soup.find(attrs={"class": "webProductHeading"}).text.strip()
+            new_name = soup.find(attrs={"itemprop": "name"}).text.strip()
         except:
             new_name = None
 
     # Парсим цену
     try:
-        price_text = soup.find(attrs={"class": "tsHeadline600Large"}).text.strip()
+        price_text = soup.find(attrs={"itemprop": "price"}).text.strip()
         digits = ''.join([c for c in price_text if c.isdigit()])
         new_price = int(digits) if digits else None
     except:
